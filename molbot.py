@@ -20,13 +20,18 @@ async def on_ready():
 
 
 @bot.command()
-async def startkey(ctx, numPlayers, numImpostors):
+async def startgame(ctx, *args):
     global gameRunning
     global playerNumber
     global impostorNumber
 
-    playerNumber = int(numPlayers)
-    impostorNumber = int(numImpostors)
+    if(len(args) != 2):
+        await ctx.send("Incorrect number of arguments. Correct format:\
+                       \n```$startgame [number of players] [number of impostors]```")
+        return
+
+    playerNumber = int(args[0])
+    impostorNumber = int(args[1])
 
     if(playerNumber <= 1):
         await ctx.send("Need at least 2 players to start a game.")
@@ -54,17 +59,20 @@ async def join(ctx):
         await ctx.send("You are already in the game!")
         return
     
+    responses = ["https://tenor.com/view/we-do-a-little-trolling-gif-21041353" , "https://tenor.com/view/imposter-detected-gif-21973555" , "https://tenor.com/view/sus-dog-sussy-baka-sussy-dog-ring-doorbell-gif-24026808" , \
+                 "https://tenor.com/view/vince-mcmahon-entrance-wwe-walk-time-to-troll-gif-17431096" , "https://tenor.com/view/cat-troll-trolling-we-do-a-little-trolling-we-do-gif-21450570" , "https://tenor.com/view/silly-cat-cat-meme-face-cat-shocked-orange-cat-what-da-hell-gif-15285770798606642445 (you are the impostor)"]
+    
     if(len(players) < playerNumber):
         players.append(ctx.message.author.id)
         await ctx.send(f"{ctx.message.author.name} has joined. {playerNumber - len(players)} more players are required to begin.")
-        if(len(players) >= playerNumber): #this should be working? needs testing
+        if(len(players) >= playerNumber):
             await ctx.send("Game starting! Check your DMs for a message from me!")
             count = 0
             while (count < impostorNumber):
                 user = bot.get_user(random.choice(players))
                 if (user not in impostor):
                     impostor.append(user)
-                    await user.send("You are the impostor :sunglasses:")
+                    await user.send(random.choice(responses))
                     count += 1
             await ctx.send("DM(s) Sent! Good luck!")
 
@@ -84,12 +92,17 @@ async def cancel(ctx):
         return
     
 @bot.command()
-async def finishkey(ctx):
+async def finishgame(ctx):
     global impostor
     global gameRunning
 
     if (ctx.message.author.id == players[0] and gameRunning == 1):
-        await ctx.send("The impostor was...") #fix grammar
+        if (impostorNumber == 1):
+            await ctx.send("The impostor was...")
+        elif (impostorNumber > 1):
+            await ctx.send("The impostors were...")
+        else:
+            await ctx.send("There were no impostors!")
         for name in impostor:
             await ctx.send(f"||{name}!||")
         gameRunning = 0
@@ -116,10 +129,8 @@ async def birthday(ctx):
 bot.run(BOT_TOKEN)
 
 #add functionality to start game early (w less than 5)
-#allow for input of number of players and impostors
-#add functionality to make game time out after a set amount of time
+#add functionality to make game cancelable after a set amount of time
 #resolve discord.ext.commands.errors.CommandNotFound: Command "  " is not found (error message?)
-#add various messages that the bot can send to the impostor
 #add chance for multiple people to be impostor, nobody, etc. (make this OPTIONAL!)
 #voting system in discord?
 #ELO!!!!
