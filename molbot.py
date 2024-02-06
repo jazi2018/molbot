@@ -4,9 +4,9 @@ import discord
 from discord.ext import commands
 import random
 
-bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
+BOT_TOKEN = "Sample Token"
 
-BOT_TOKEN = "SampleToken"
+bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 
 players = []
 playerNumber = 0
@@ -20,44 +20,53 @@ async def on_ready():
 
 
 @bot.command()
-async def startkey(ctx):
+async def startkey(ctx, numPlayers, numImpostors):
     global gameRunning
+    global playerNumber
+    global impostorNumber
+
+    playerNumber = int(numPlayers)
+    impostorNumber = int(numImpostors)
+
+    if(playerNumber <= 1):
+        await ctx.send("Need at least 2 players to start a game.")
+        return
+
     if(gameRunning == 0):
         players.append(ctx.message.author.id)
-        await ctx.send(f"{ctx.message.author.name} has joined. {5 - len(players)} more players are required to begin. Type **$join** to join!")
+        await ctx.send(f"{ctx.message.author.name} has joined. {playerNumber - len(players)} more players are required to begin. Type **$join** to join!")
         gameRunning = 1
     elif(gameRunning == 1):
         await ctx.send("Game is already running! Please join or wait for the game to end before trying to start a new one.")
         return
 
 @bot.command()
-async def join(ctx, numPlayers, numImpostors):
+async def join(ctx):
     global gameRunning
     global playerNumber
     global impostorNumber
 
-    count = 0
-    playerNumber = numPlayers
-    impostorNumber = numImpostors
     if(gameRunning == 0):
         await ctx.send("No game running! Please start a game to enable joining.")
         return
+    
     if(ctx.message.author.id in players):
         await ctx.send("You are already in the game!")
         return
+    
     if(len(players) < playerNumber):
         players.append(ctx.message.author.id)
         await ctx.send(f"{ctx.message.author.name} has joined. {playerNumber - len(players)} more players are required to begin.")
-        if(len(players) == playerNumber): #this should be working? needs testing
+        if(len(players) >= playerNumber): #this should be working? needs testing
             await ctx.send("Game starting! Check your DMs for a message from me!")
+            count = 0
             while (count < impostorNumber):
                 user = bot.get_user(random.choice(players))
                 if (user not in impostor):
                     impostor.append(user)
                     await user.send("You are the impostor :sunglasses:")
-                    +count
+                    count += 1
             await ctx.send("DM(s) Sent! Good luck!")
-            
 
     else:
         await ctx.send("Game is full!")
@@ -78,12 +87,14 @@ async def cancel(ctx):
 async def finishkey(ctx):
     global impostor
     global gameRunning
-    if (ctx.message.author.id == players[0] & gameRunning == 1):
-        await ctx.send("The impostor was...")
-        await ctx.send(f"||{impostor}!||")
+
+    if (ctx.message.author.id == players[0] and gameRunning == 1):
+        await ctx.send("The impostor was...") #fix grammar
+        for name in impostor:
+            await ctx.send(f"||{name}!||")
         gameRunning = 0
         players.clear()
-        impostor = "null"
+        impostor.clear()
     elif(gameRunning == 0):
         await ctx.send("There is no game currently running.")
     else:
@@ -111,3 +122,4 @@ bot.run(BOT_TOKEN)
 #add various messages that the bot can send to the impostor
 #add chance for multiple people to be impostor, nobody, etc. (make this OPTIONAL!)
 #voting system in discord?
+#ELO!!!!
