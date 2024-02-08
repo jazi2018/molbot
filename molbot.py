@@ -3,8 +3,9 @@
 import discord
 from discord.ext import commands
 import random
+import csv
 
-BOT_TOKEN = "Sample Token"
+BOT_TOKEN = "Sample_Token"
 
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 
@@ -18,6 +19,27 @@ impostor = []
 async def on_ready():
     print("Bot is online.")
 
+"""
+@bot.command()
+async def quote(ctx, *args):
+
+    if(len(args) > 0):
+        #if(len(args)!= 2):
+            #await ctx.send("Incorrect number of arguments. Correct format:\
+                            #```$quote [username] [quote (with no quotation marks)]```")
+        #return
+        username = args[0]
+        quote = args[1:]
+
+        with open("quotes.csv" , "a+") as csvfile:
+            csvwriter = csv.writer(csvfile)
+
+        await ctx.send(f'{username} said \"{" ".join(quote)}\"')
+    else:
+        #find a random value from a saved array
+        return
+WIP. Need to configure csv file first.
+"""
 
 @bot.command()
 async def startgame(ctx, *args):
@@ -35,6 +57,10 @@ async def startgame(ctx, *args):
 
     if(playerNumber <= 1):
         await ctx.send("Need at least 2 players to start a game.")
+        return
+    
+    if(impostorNumber < 1):
+        await ctx.send("There must be at least 1 impostor.")
         return
 
     if(gameRunning == 0):
@@ -134,3 +160,9 @@ bot.run(BOT_TOKEN)
 #add chance for multiple people to be impostor, nobody, etc. (make this OPTIONAL!)
 #voting system in discord?
 #ELO!!!!
+
+#quotes functionality, permanently stores quotes
+#returns a quote if a user and quote is not specified
+#could make a game, guess who said the quote
+
+#consider defining classes so global variables are avoided
