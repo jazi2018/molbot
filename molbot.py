@@ -5,7 +5,7 @@ from discord.ext import commands
 import random
 import csv
 
-BOT_TOKEN = "Sample_Token"
+BOT_TOKEN = "MTIwMjcyNDYzMDg0NzE2MDQxMQ.GyvKU6.bH8DTqSTO_rqjkqh3yIDdvH3iayPjroruOIbUY"
 
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 
@@ -19,27 +19,38 @@ impostor = []
 async def on_ready():
     print("Bot is online.")
 
-"""
 @bot.command()
 async def quote(ctx, *args):
 
     if(len(args) > 0):
-        #if(len(args)!= 2):
-            #await ctx.send("Incorrect number of arguments. Correct format:\
-                            #```$quote [username] [quote (with no quotation marks)]```")
-        #return
+        if(len(args) == 1):
+            await ctx.send("Incorrect number of arguments. Correct format:\
+                            ```$quote [username] [quote (with no quotation marks)]```")
+            return
+        
         username = args[0]
-        quote = args[1:]
+        quote = " ".join(args[1:])
 
-        with open("quotes.csv" , "a+") as csvfile:
-            csvwriter = csv.writer(csvfile)
+        with open("quotes.csv" , "a" , newline='') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow([username, quote])
+            csvfile.close()
 
-        await ctx.send(f'{username} said \"{" ".join(quote)}\"')
+        await ctx.send(f'Registered that {username} said \"{quote}\"')
     else:
-        #find a random value from a saved array
-        return
-WIP. Need to configure csv file first.
-"""
+        with open("quotes.csv", 'r') as csvfile:
+            csv_reader = csv.reader(csvfile)
+
+            lines = []
+
+            for line in csv_reader:
+                lines.append(line)
+
+            picked_line = (random.randint(1 , len(lines) - 1))
+            await ctx.send(f'\"{lines[picked_line][1]}\" -{lines[picked_line][0]}')
+            return
+            
+#include functionality to guess who said quote
 
 @bot.command()
 async def startgame(ctx, *args):
@@ -161,8 +172,6 @@ bot.run(BOT_TOKEN)
 #voting system in discord?
 #ELO!!!!
 
-#quotes functionality, permanently stores quotes
-#returns a quote if a user and quote is not specified
 #could make a game, guess who said the quote
 
 #consider defining classes so global variables are avoided
