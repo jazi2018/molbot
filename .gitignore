@@ -1,0 +1,5 @@
+#env file to store bot token
+.env
+
+#cache
+__pycache__

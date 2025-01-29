@@ -1,11 +1,18 @@
 #invite url https://discord.com/api/oauth2/authorize?client_id=1202724630847160411&permissions=412317207616&scope=bot
 
+#discord API wrapper
 import discord
 from discord.ext import commands
+#.env token import
+import os
+from dotenv import load_dotenv
+#bot functionality
 import random
 import csv
+import asyncio
 
-BOT_TOKEN = "MTIwMjcyNDYzMDg0NzE2MDQxMQ.GyvKU6.bH8DTqSTO_rqjkqh3yIDdvH3iayPjroruOIbUY"
+load_dotenv()
+BOT_TOKEN = os.getenv('TOKEN')
 
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 
@@ -15,9 +22,22 @@ impostorNumber = 0
 gameRunning = 0
 impostor = []
 
+async def load_extensions():
+    await bot.load_extension('cog')
+
+@bot.event
+async def setup_hook():
+    await load_extensions()
+
 @bot.event
 async def on_ready():
     print("Bot is online.")
+
+@bot.command()
+async def members(ctx):
+    guild = ctx.guild
+    member_list = [member.name for member in guild.members if not member.bot]
+    await ctx.send(f'Members in {guild.name}:\n{', '.join(member_list)}')
 
 @bot.command()
 async def quote(ctx, *args):
@@ -163,7 +183,10 @@ async def birthday(ctx):
     await ctx.send("holy flip happy flipping birthday!")
     await ctx.send("https://media1.tenor.com/m/Y89slvaDQ1sAAAAC/suguru-geto-geto.gif")
 
-bot.run(BOT_TOKEN)
+async def main():
+    await bot.start(BOT_TOKEN)
+
+asyncio.run(main())
 
 #add functionality to start game early (w less than 5)
 #add functionality to make game cancelable after a set amount of time
