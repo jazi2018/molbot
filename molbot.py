@@ -184,7 +184,7 @@ async def birthday(ctx):
     await ctx.send("https://media1.tenor.com/m/Y89slvaDQ1sAAAAC/suguru-geto-geto.gif")
 
 async def main():
-    await bot.start(BOT_TOKEN)
+    await bot.run(BOT_TOKEN)
 
 asyncio.run(main())
 
