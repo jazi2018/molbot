@@ -5,13 +5,13 @@ import discord
 from discord.ext import commands
 #.env token import
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 #bot functionality
 import random
 import csv
 import asyncio
 
-# load_dotenv()
+#load_dotenv()
 BOT_TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
