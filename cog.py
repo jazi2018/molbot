@@ -10,24 +10,26 @@ midnight = datetime.time(hour=8, minute=0, tzinfo=utc)
 class GroupLeader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.sel_alpha.start()
         self.group_leader = None
+        self.sel_alpha.start()
 
     def cog_unload(self):
         self.sel_alpha.cancel()
 
     @tasks.loop(time=midnight)
     async def sel_alpha(self):
-        print("determining group leader.....")
         guild_id = 1159064214476959794 #doncord
         guild = self.bot.get_guild(guild_id)
 
         if guild:
             members = [member for member in guild.members if not member.bot]
             if members:
-                self.group_leader = random.choice(members)
-                channel = guild.get_channel(1159064215735246921)
-                if channel:
+                #self.group_leader = random.choice(members)
+                #temporary code to make CR alpha over and over again
+                #remove code below and uncomment code above to fix
+                self.group_leader = guild.get_member(245775933682876420)
+                channel = guild.get_channel(1159064215735246921) #general
+                if channel and self.group_leader:
                     await channel.send(f'rise and grind alphas.... todays group leader is {self.group_leader.mention}!!')
                     await channel.send(f'https://tenor.com/view/haechan-127hivemind-alpha-wolf-nct-nct-haechan-gif-26541424')
 
