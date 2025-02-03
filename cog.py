@@ -28,6 +28,7 @@ class GroupLeader(commands.Cog):
                 #temporary code to make CR alpha over and over again
                 #remove code below and uncomment code above to fix
                 self.group_leader = guild.get_member(245775933682876420)
+                #TODO: add file writing for group leader so it can be recalled in the leader command
                 channel = guild.get_channel(1159064215735246921) #general
                 if channel and self.group_leader:
                     await channel.send(f'rise and grind alphas.... todays group leader is {self.group_leader.mention}!!')
