@@ -24,10 +24,7 @@ class GroupLeader(commands.Cog):
         if guild:
             members = [member for member in guild.members if not member.bot]
             if members:
-                #self.group_leader = random.choice(members)
-                #temporary code to make CR alpha over and over again
-                #remove code below and uncomment code above to fix
-                self.group_leader = guild.get_member(245775933682876420)
+                self.group_leader = random.choice(members)
                 #TODO: add file writing for group leader so it can be recalled in the leader command
                 channel = guild.get_channel(1159064215735246921) #general
                 if channel and self.group_leader:
