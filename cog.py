@@ -53,27 +53,27 @@ class GroupLeader(commands.Cog):
     async def test(self, ctx):
         #set var to role
         try:
-            role = discord.utils.get(ctx.guild.roles, role='group leader')
+            role = discord.utils.get(ctx.guild.roles, name='group leader')
         except discord.DiscordException as e:
-            print('role not found: {e}')
+            print(f'role not found: {e}')
         if role:
             print(role)
             #remove roles from everyone
             members = [member for member in ctx.guild.members if not member.bot]
             if members:
                 for member in members:
-                    if member.roles.has(role):
+                    if role in member.roles:
                         try:
                             await member.remove_roles(role)
                         except discord.DiscordException as e:
-                            print('failed to remove role: {e}')
+                            print(f'failed to remove role: {e}')
                 #choose random member and assign role
                 sel = random.choice(members)
                 try:
                     await sel.add_roles(role)
-                    await ctx.send(f'{member.name} has been given {role}')
+                    await ctx.send(f'{sel.name} has been given {role}')
                 except discord.DiscordException as e:
-                    print('failed to give role: {e}')
+                    print(f'failed to give role: {e}')
             else:
                 print('member list failed')
         else:
