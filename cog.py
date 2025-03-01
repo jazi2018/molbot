@@ -23,18 +23,26 @@ class GroupLeader(commands.Cog):
         guild = self.bot.get_guild(guild_id)
 
         if guild:
-            members = [member for member in guild.members if not member.bot]
+            members = [member for member in guild.members if not member.bot] #and role (to subscribe to game) in member.roles
             if members:
                 self.group_leader = random.choice(members)
                 channel = guild.get_channel(1159064215735246921) #general
+                #NOTE: make a fork for local testing
                 if channel and self.group_leader:
-                    # if guild.me.guild_permissions.manage_roles:
-                    #     try:
-                    #         role_name = 'group leader'
-                    #         role = discord.utils.get(guild.roles, name=role_name)
-                    #         await self.group_leader.add_roles(role)
-                    #     except discord.DiscordException as e:
-                    #         channel.send(f'Error assigning role: {e}')
+                    try:
+                        role_name = 'group leader'
+                        role = discord.utils.get(guild.roles, name=role_name)
+
+                        #clear out previous group leader
+                        for member in members:
+                            if role in member.roles:
+                                await member.remove_roles(role)
+
+                        await self.group_leader.add_roles(role)
+
+                    except discord.DiscordException as e:
+                        channel.send(f'error assigning role: {e}')
+
                     await channel.send(f'rise and grind alphas.... todays group leader is {self.group_leader.mention}!!')
                     await channel.send(f'https://tenor.com/view/haechan-127hivemind-alpha-wolf-nct-nct-haechan-gif-26541424')
 
@@ -44,40 +52,43 @@ class GroupLeader(commands.Cog):
     
     @commands.command()
     async def leader(self, ctx):
-        if self.group_leader is None:
-            await ctx.send('erm. there is no group leader today. wtf???')
-        else:
-            await ctx.send(f'your sigma group leader for today is {self.group_leader.name}')
+        '''announces current group leader'''
+        role = discord.utils.get(ctx.guild.roles, name='group leader')
+        for member in ctx.guild.members:
+            if role in member.roles:
+                print(f'your current group leader is {member.name}')
+                return
+        
+        print('this server does not currently have a group leader :-)')
     
-    @commands.command()
-    async def test(self, ctx):
-        #set var to role
-        try:
-            role = discord.utils.get(ctx.guild.roles, name='group leader')
-        except discord.DiscordException as e:
-            print(f'role not found: {e}')
-        if role:
-            print(role)
-            #remove roles from everyone
-            members = [member for member in ctx.guild.members if not member.bot]
-            if members:
-                for member in members:
-                    if role in member.roles:
-                        try:
-                            await member.remove_roles(role)
-                        except discord.DiscordException as e:
-                            print(f'failed to remove role: {e}')
-                #choose random member and assign role
-                sel = random.choice(members)
-                try:
-                    await sel.add_roles(role)
-                    await ctx.send(f'{sel.name} has been given {role}')
-                except discord.DiscordException as e:
-                    print(f'failed to give role: {e}')
-            else:
-                print('member list failed')
-        else:
-            print('no role found')
+    # @commands.command()
+    # async def test(self, ctx):
+    #     #set var to role
+    #     try:
+    #         role = discord.utils.get(ctx.guild.roles, name='group leader')
+    #     except discord.DiscordException as e:
+    #         print(f'role not found: {e}')
+    #     if role:
+    #         #remove roles from everyone
+    #         members = [member for member in ctx.guild.members if not member.bot]
+    #         if members:
+    #             for member in members:
+    #                 if role in member.roles:
+    #                     try:
+    #                         await member.remove_roles(role)
+    #                     except discord.DiscordException as e:
+    #                         print(f'failed to remove role: {e}')
+    #             #choose random member and assign role
+    #             sel = random.choice(members)
+    #             try:
+    #                 await sel.add_roles(role)
+    #                 await ctx.send(f'{sel.name} has been given {role}')
+    #             except discord.DiscordException as e:
+    #                 print(f'failed to give role: {e}')
+    #         else:
+    #             print('member list failed')
+    #     else:
+    #         print('no role found')
 
 async def setup(bot):
     await bot.add_cog(GroupLeader(bot))
