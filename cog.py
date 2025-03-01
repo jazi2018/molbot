@@ -52,7 +52,10 @@ class GroupLeader(commands.Cog):
     @commands.command()
     async def test(self, ctx):
         #set var to role
-        role = discord.utils.get(ctx.guild.roles, role='group leader')
+        try:
+            role = discord.utils.get(ctx.guild.roles, role='group leader')
+        except discord.DiscordException as e:
+            print('role not found: {e}')
         if role:
             print(role)
             #remove roles from everyone
