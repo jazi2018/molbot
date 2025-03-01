@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands, tasks
 import datetime
 import random
@@ -25,9 +26,15 @@ class GroupLeader(commands.Cog):
             members = [member for member in guild.members if not member.bot]
             if members:
                 self.group_leader = random.choice(members)
-                #TODO: add file writing for group leader so it can be recalled in the leader command
                 channel = guild.get_channel(1159064215735246921) #general
                 if channel and self.group_leader:
+                    # if guild.me.guild_permissions.manage_roles:
+                    #     try:
+                    #         role_name = 'group leader'
+                    #         role = discord.utils.get(guild.roles, name=role_name)
+                    #         await self.group_leader.add_roles(role)
+                    #     except discord.DiscordException as e:
+                    #         channel.send(f'Error assigning role: {e}')
                     await channel.send(f'rise and grind alphas.... todays group leader is {self.group_leader.mention}!!')
                     await channel.send(f'https://tenor.com/view/haechan-127hivemind-alpha-wolf-nct-nct-haechan-gif-26541424')
 
@@ -41,6 +48,11 @@ class GroupLeader(commands.Cog):
             await ctx.send('erm. there is no group leader today. wtf???')
         else:
             await ctx.send(f'your sigma group leader for today is {self.group_leader.name}')
+    
+    @commands.command()
+    async def test(self, ctx):
+        #assign random person the role
+        print(ctx.guild.members)
 
 async def setup(bot):
     await bot.add_cog(GroupLeader(bot))
