@@ -56,10 +56,10 @@ class GroupLeader(commands.Cog):
         role = discord.utils.get(ctx.guild.roles, name='group leader')
         for member in ctx.guild.members:
             if role in member.roles:
-                print(f'your current group leader is {member.name}')
+                await ctx.send(f'your current group leader is {member.name}')
                 return
         
-        print('this server does not currently have a group leader :-)')
+        await ctx.send('this server does not currently have a group leader :-)')
     
     # @commands.command()
     # async def test(self, ctx):
