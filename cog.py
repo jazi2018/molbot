@@ -87,7 +87,7 @@ class GroupLeader(commands.Cog):
 
                 if role and member:
                     await member.remove_roles(role) #adds role to user
-                    print(f'assigned role to {member.name} ({member.id})')
+                    print(f'removed role from {member.name} ({member.id})')
 
                 else:
                     print('no such role or member exists in current server')
