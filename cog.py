@@ -60,7 +60,7 @@ class GroupLeader(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         '''adds role to users who react to specific message'''
-        print(f'message reaction on {payload.message_id}')
+        #print(f'message reaction on {payload.message_id}')
         #check valid reaction at target message
         if payload.message_id == self.msg_id and str(payload.emoji) == '🐺':
             guild = self.bot.get_guild(payload.guild_id) #get guild from payload
@@ -78,7 +78,7 @@ class GroupLeader(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         '''removes role from people who un-react to a message'''
-        print(f'message reaction on {payload.message_id}')
+        #print(f'message reaction on {payload.message_id}')
         if payload.message_id == self.msg_id and str(payload.emoji) == '🐺':
             guild = self.bot.get_guild(payload.guild_id) #get guild from payload
             if guild:
