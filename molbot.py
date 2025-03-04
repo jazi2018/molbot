@@ -22,12 +22,13 @@ impostorNumber = 0
 gameRunning = 0
 impostor = []
 
-async def load_extensions():
-    await bot.load_extension('cog')
+#NOTE: Temporary comment for testing
+# async def load_extensions():
+#     await bot.load_extension('cog')
 
-@bot.event
-async def setup_hook():
-    await load_extensions()
+# @bot.event
+# async def setup_hook():
+#     await load_extensions()
 
 @bot.event
 async def on_ready():
@@ -184,7 +185,10 @@ async def birthday(ctx):
     await ctx.send("https://media1.tenor.com/m/Y89slvaDQ1sAAAAC/suguru-geto-geto.gif")
 
 async def main():
-    await bot.start(BOT_TOKEN)
+    async with bot:
+        print('loading cogs:')
+        await bot.load_extension('cog')
+        await bot.start(BOT_TOKEN)
 
 asyncio.run(main())
 
