@@ -95,6 +95,9 @@ class GroupLeader(commands.Cog):
 
         if guild:
             members = [member for member in guild.members if not member.bot] #and role (to subscribe to game) in member.roles
+            role_name = 'pack member'
+            role = discord.utils.get(guild.roles, name=role_name) #get pack member role
+            members = [member for member in members if role in member.roles] #filter out non pack members
             if members:
                 self.group_leader = random.choice(members)
                 channel = guild.get_channel(1159064215735246921) #general
