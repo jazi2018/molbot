@@ -49,12 +49,14 @@ class GroupLeader(commands.Cog):
                 print('msg sent and pinned')
             else:
                 print('channel not found')
+        print(self.msg_id)
 
     ### GAME OPT-IN ###
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         '''adds role to users who react to specific message'''
+        print(f'message reaction on {reaction.message.id}')
         #check valid reaction at target message
         if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
             guild = reaction.message.guild
@@ -73,13 +75,14 @@ class GroupLeader(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         '''removes role from people who un-react to a message'''
+        print(f'message reaction on {reaction.message.id}')
         if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
             guild = reaction.message.guild
             role = discord.utils.get(guild.roles, name='pack member')
             if role:
                 member = guild.get_member(user.id) #get member id from reactor
                 if member:
-                    await member.remove_roles(role) #adds role to user
+                    await member.remove_roles(role) #removes role
                     print(f'removed role from {user.name} ({user.id})')
                 else:
                     print(f'could not find member {user.name} ({user.id})')
