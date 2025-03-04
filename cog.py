@@ -83,9 +83,7 @@ class GroupLeader(commands.Cog):
                     print(f'could not find member {user.name} ({user.id})')
             else:
                 print('no such role exists in current server')
-
-    @commands.command()
-
+                
     ### DAILY SELECTION ###
 
     @tasks.loop(time=midnight)
