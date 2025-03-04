@@ -12,86 +12,85 @@ class GroupLeader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.group_leader = None
-        self.msg = None #message in welcome channel of doncord
+        self.msg_id = 1346351199519248488 #message in welcome channel of doncord
         self.sel_alpha.start()
 
     def cog_unload(self):
         self.sel_alpha.cancel()
 
-    async def cache_message(self):
-        '''fetches reaction message on bot startup to ensure
-        it's not repeated & msg_id persists thru restarts'''
-        welcome_id = 1159237538318389253 #welcome channel in doncord
-        channel = self.bot.get_channel(welcome_id)
-        if channel:
-            try:
-                self.msg = await channel.fetch_message(1346351199519248488) #hard coded specific message
-                print(f'message fetched: {self.msg.id}')
-                return True
-            except discord.NotFound:
-                print('message not found')
-                return False
+    # async def cache_message(self):
+    #     '''fetches reaction message on bot startup to ensure
+    #     it's not repeated & msg_id persists thru restarts'''
+    #     welcome_id = 1159237538318389253 #welcome channel in doncord
+    #     channel = self.bot.get_channel(welcome_id)
+    #     if channel:
+    #         try:
+    #             self.msg = await channel.fetch_message(1346351199519248488) #hard coded specific message
+    #             print(f'message fetched: {self.msg.id}')
+    #             return True
+    #         except discord.NotFound:
+    #             print('message not found')
+    #             return False
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        '''attempts to fetch target message on reboot - 
-        on fail prints a message to welcome channel'''
-        print('on_ready running within cog')
-        if not await self.cache_message():
-            #if message is not found, send a new message
-            welcome_id = 1159237538318389253 #welcome channel in doncord
-            channel = self.bot.get_channel(welcome_id)
-            if channel:
-                message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
-                self.msg = message
-                print(f'new message id: {self.msg.id}')
+    # @commands.Cog.listener()
+    # async def on_ready(self):
+    #     '''attempts to fetch target message on reboot - 
+    #     on fail prints a message to welcome channel'''
+    #     print('on_ready running within cog')
+    #     if not await self.cache_message():
+    #         #if message is not found, send a new message
+    #         welcome_id = 1159237538318389253 #welcome channel in doncord
+    #         channel = self.bot.get_channel(welcome_id)
+    #         if channel:
+    #             message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
+    #             self.msg = message
+    #             print(f'new message id: {self.msg.id}')
 
-                await message.add_reaction('🐺')
-                await message.pin()
-                print('msg sent and pinned')
-            else:
-                print('channel not found')
+    #             await message.add_reaction('🐺')
+    #             await message.pin()
+    #             print('msg sent and pinned')
+    #         else:
+    #             print('channel not found')
         
-        if self.msg:
-            print(f'message with id {self.msg.id} sucessfully cached')
+    #     if self.msg:
+    #         print(f'message with id {self.msg.id} sucessfully cached')
 
     ### GAME OPT-IN ###
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
+    async def on_raw_reaction_add(self, payload):
         '''adds role to users who react to specific message'''
         #print(f'message reaction on {reaction.message.id}')
         #check valid reaction at target message
-        if reaction.message == self.msg and str(reaction.emoji) == '🐺':
-            guild = reaction.message.guild
-            role = discord.utils.get(guild.roles, name='pack member')
+        if payload.message.id == self.msg_id and str(payload.emoji) == '🐺':
+            guild = self.bot.get_guild(payload.guild_id) #get guild from payload
+            if guild:
+                role = discord.utils.get(guild.roles, name='pack member')
+                member = guild.get_member(payload.user_id) #get member from payload
 
-            if role:
-                member = guild.get_member(user.id) #get member id from reactor
-                if member:
+                if role and member:
                     await member.add_roles(role) #adds role to user
-                    print(f'assigned role to {user.name} ({user.id})')
+                    print(f'assigned role to {member.name} ({member.id})')
+
                 else:
-                    print(f'could not find member {user.name} ({user.id})')
-            else:
-                print('no such role exists in current server')
+                    print('no such role or member exists in current server')
     
     @commands.Cog.listener()
-    async def on_reaction_remove(self, reaction, user):
+    async def on_raw_reaction_remove(self, payload):
         '''removes role from people who un-react to a message'''
         #print(f'message reaction on {reaction.message.id}')
-        if reaction.message == self.msg and str(reaction.emoji) == '🐺':
-            guild = reaction.message.guild
-            role = discord.utils.get(guild.roles, name='pack member')
-            if role:
-                member = guild.get_member(user.id) #get member id from reactor
-                if member:
-                    await member.remove_roles(role) #removes role
-                    print(f'removed role from {user.name} ({user.id})')
+        if payload.message.id == self.msg_id and str(payload.emoji) == '🐺':
+            guild = self.bot.get_guild(payload.guild_id) #get guild from payload
+            if guild:
+                role = discord.utils.get(guild.roles, name='pack member')
+                member = guild.get_member(payload.user_id) #get member from payload
+
+                if role and member:
+                    await member.remove_roles(role) #adds role to user
+                    print(f'assigned role to {member.name} ({member.id})')
+
                 else:
-                    print(f'could not find member {user.name} ({user.id})')
-            else:
-                print('no such role exists in current server')
+                    print('no such role or member exists in current server')
 
     ### DAILY SELECTION ###
 
