@@ -12,10 +12,81 @@ class GroupLeader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.group_leader = None
+        self.msg_id = None
         self.sel_alpha.start()
 
     def cog_unload(self):
         self.sel_alpha.cancel()
+
+    async def fetch_message(self):
+        '''fetches reaction message on bot startup to ensure
+        it's not repeated & msg_id persists thru restarts'''
+        welcome_id = 1159237538318389253 #welcome channel in doncord
+        channel = self.bot.get_channel(welcome_id)
+        if channel:
+            pinned = await channel.pins()
+            for msg in pinned:
+                if msg.content == 'react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)':
+                    self.msg_id = msg.id
+                    print(f'located reaction message with id: {self.msg_id}')
+                    return True
+        print('no message found')
+        return False
+
+    async def on_ready(self):
+        '''attempts to fetch target message on reboot - 
+        on fail prints a message to welcome channel'''
+        if not await self.fetch_message():
+            welcome_id = 1159237538318389253 #welcome channel in doncord
+            channel = self.bot.get_channel(welcome_id)
+            if channel:
+                message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
+                self.msg_id = message.id #save id
+                await message.add_reaction('🐺')
+                await message.pin()
+                print('msg sent and pinned')
+            else:
+                print('channel not found')
+
+    ### GAME OPT-IN ###
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        '''adds role to users who react to specific message'''
+        #check valid reaction at target message
+        if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
+            guild = reaction.message.guild
+            role = discord.utils.get(guild.roles, name='pack member')
+
+            if role:
+                member = guild.get_member(user.id) #get member id from reactor
+                if member:
+                    await member.add_roles(role) #adds role to user
+                    print(f'assigned role to {user.name} ({user.id})')
+                else:
+                    print(f'could not find member {user.name} ({user.id})')
+            else:
+                print('no such role exists in current server')
+    
+    @commands.Cog.listener()
+    async def on_reaction_remove(self, reaction, user):
+        '''removes role from people who un-react to a message'''
+        if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
+            guild = reaction.message.guild
+            role = discord.utils.get(guild.roles, name='pack member')
+            if role:
+                member = guild.get_member(user.id) #get member id from reactor
+                if member:
+                    await member.remove_roles(role) #adds role to user
+                    print(f'removed role from {user.name} ({user.id})')
+                else:
+                    print(f'could not find member {user.name} ({user.id})')
+            else:
+                print('no such role exists in current server')
+
+    @commands.command()
+
+    ### DAILY SELECTION ###
 
     @tasks.loop(time=midnight)
     async def sel_alpha(self):
