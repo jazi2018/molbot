@@ -12,44 +12,43 @@ class GroupLeader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.group_leader = None
-        self.msg_id = None
+        self.msg_id = 1346351199519248488 #message in welcome channel of doncord
         self.sel_alpha.start()
 
     def cog_unload(self):
         self.sel_alpha.cancel()
 
-    async def fetch_message(self):
-        '''fetches reaction message on bot startup to ensure
-        it's not repeated & msg_id persists thru restarts'''
-        welcome_id = 1159237538318389253 #welcome channel in doncord
-        channel = self.bot.get_channel(welcome_id)
-        if channel:
-            pinned = await channel.pins()
-            for msg in pinned:
-                if msg.content == 'react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)':
-                    self.msg_id = msg.id
-                    print(f'located reaction message with id: {self.msg_id}')
-                    return True
-        print('no message found')
-        return False
+    # async def fetch_target_message(self):
+    #     '''fetches reaction message on bot startup to ensure
+    #     it's not repeated & msg_id persists thru restarts'''
+    #     welcome_id = 1159237538318389253 #welcome channel in doncord
+    #     channel = self.bot.get_channel(welcome_id)
+    #     if channel:
+    #         pinned = await channel.pins()
+    #         for msg in pinned:
+    #             if msg.content == 'react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)':
+    #                 self.msg_id = msg.id
+    #                 print(f'located reaction message with id: {self.msg_id}')
+    #                 return True
+    #     print('no message found')
+    #     return False
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        '''attempts to fetch target message on reboot - 
-        on fail prints a message to welcome channel'''
-        print('on_ready running within cog')
-        if not await self.fetch_message():
-            welcome_id = 1159237538318389253 #welcome channel in doncord
-            channel = self.bot.get_channel(welcome_id)
-            if channel:
-                message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
-                self.msg_id = message.id #save id
-                await message.add_reaction('🐺')
-                await message.pin()
-                print('msg sent and pinned')
-            else:
-                print('channel not found')
-        print(self.msg_id)
+    # @commands.Cog.listener()
+    # async def on_ready(self):
+    #     '''attempts to fetch target message on reboot - 
+    #     on fail prints a message to welcome channel'''
+    #     print('on_ready running within cog')
+    #     if not await self.fetch_target_message():
+    #         welcome_id = 1159237538318389253 #welcome channel in doncord
+    #         channel = self.bot.get_channel(welcome_id)
+    #         if channel:
+    #             message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
+    #             self.msg_id = message.id #save id
+    #             await message.add_reaction('🐺')
+    #             await message.pin()
+    #             print('msg sent and pinned')
+    #         else:
+    #             print('channel not found')
 
     ### GAME OPT-IN ###
 
