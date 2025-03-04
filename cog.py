@@ -36,6 +36,7 @@ class GroupLeader(commands.Cog):
     async def on_ready(self):
         '''attempts to fetch target message on reboot - 
         on fail prints a message to welcome channel'''
+        print('on_ready running within cog')
         if not await self.fetch_message():
             welcome_id = 1159237538318389253 #welcome channel in doncord
             channel = self.bot.get_channel(welcome_id)
@@ -83,7 +84,7 @@ class GroupLeader(commands.Cog):
                     print(f'could not find member {user.name} ({user.id})')
             else:
                 print('no such role exists in current server')
-                
+
     ### DAILY SELECTION ###
 
     @tasks.loop(time=midnight)
