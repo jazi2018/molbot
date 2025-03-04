@@ -62,7 +62,7 @@ class GroupLeader(commands.Cog):
         '''adds role to users who react to specific message'''
         #print(f'message reaction on {reaction.message.id}')
         #check valid reaction at target message
-        if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
+        if reaction.message == self.msg and str(reaction.emoji) == '🐺':
             guild = reaction.message.guild
             role = discord.utils.get(guild.roles, name='pack member')
 
@@ -80,7 +80,7 @@ class GroupLeader(commands.Cog):
     async def on_reaction_remove(self, reaction, user):
         '''removes role from people who un-react to a message'''
         #print(f'message reaction on {reaction.message.id}')
-        if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
+        if reaction.message == self.msg and str(reaction.emoji) == '🐺':
             guild = reaction.message.guild
             role = discord.utils.get(guild.roles, name='pack member')
             if role:
