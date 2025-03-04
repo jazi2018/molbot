@@ -12,50 +12,55 @@ class GroupLeader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.group_leader = None
-        self.msg_id = 1346351199519248488 #message in welcome channel of doncord
+        self.msg = None #message in welcome channel of doncord
         self.sel_alpha.start()
 
     def cog_unload(self):
         self.sel_alpha.cancel()
 
-    # async def fetch_target_message(self):
-    #     '''fetches reaction message on bot startup to ensure
-    #     it's not repeated & msg_id persists thru restarts'''
-    #     welcome_id = 1159237538318389253 #welcome channel in doncord
-    #     channel = self.bot.get_channel(welcome_id)
-    #     if channel:
-    #         pinned = await channel.pins()
-    #         for msg in pinned:
-    #             if msg.content == 'react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)':
-    #                 self.msg_id = msg.id
-    #                 print(f'located reaction message with id: {self.msg_id}')
-    #                 return True
-    #     print('no message found')
-    #     return False
+    async def cache_message(self):
+        '''fetches reaction message on bot startup to ensure
+        it's not repeated & msg_id persists thru restarts'''
+        welcome_id = 1159237538318389253 #welcome channel in doncord
+        channel = self.bot.get_channel(welcome_id)
+        if channel:
+            try:
+                self.msg = await channel.fetch_message(1346351199519248488) #hard coded specific message
+                print(f'message fetched: {self.msg.id}')
+                return True
+            except discord.NotFound:
+                print('message not found')
+                return False
 
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     '''attempts to fetch target message on reboot - 
-    #     on fail prints a message to welcome channel'''
-    #     print('on_ready running within cog')
-    #     if not await self.fetch_target_message():
-    #         welcome_id = 1159237538318389253 #welcome channel in doncord
-    #         channel = self.bot.get_channel(welcome_id)
-    #         if channel:
-    #             message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
-    #             self.msg_id = message.id #save id
-    #             await message.add_reaction('🐺')
-    #             await message.pin()
-    #             print('msg sent and pinned')
-    #         else:
-    #             print('channel not found')
+    @commands.Cog.listener()
+    async def on_ready(self):
+        '''attempts to fetch target message on reboot - 
+        on fail prints a message to welcome channel'''
+        print('on_ready running within cog')
+        if not await self.cache_message():
+            #if message is not found, send a new message
+            welcome_id = 1159237538318389253 #welcome channel in doncord
+            channel = self.bot.get_channel(welcome_id)
+            if channel:
+                message = await channel.send('react with 🐺 to join the pack!! (a random pack member will be chosen daily to be the new group leader)')
+                self.msg = message
+                print(f'new message id: {self.msg.id}')
+
+                await message.add_reaction('🐺')
+                await message.pin()
+                print('msg sent and pinned')
+            else:
+                print('channel not found')
+        
+        if self.msg:
+            print(f'message with id {self.msg.id} sucessfully cached')
 
     ### GAME OPT-IN ###
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         '''adds role to users who react to specific message'''
-        print(f'message reaction on {reaction.message.id}')
+        #print(f'message reaction on {reaction.message.id}')
         #check valid reaction at target message
         if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
             guild = reaction.message.guild
@@ -74,7 +79,7 @@ class GroupLeader(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         '''removes role from people who un-react to a message'''
-        print(f'message reaction on {reaction.message.id}')
+        #print(f'message reaction on {reaction.message.id}')
         if reaction.message.id == self.msg_id and str(reaction.emoji) == '🐺':
             guild = reaction.message.guild
             role = discord.utils.get(guild.roles, name='pack member')
