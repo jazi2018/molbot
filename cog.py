@@ -33,6 +33,7 @@ class GroupLeader(commands.Cog):
         print('no message found')
         return False
 
+    @commands.Cog.listener
     async def on_ready(self):
         '''attempts to fetch target message on reboot - 
         on fail prints a message to welcome channel'''
