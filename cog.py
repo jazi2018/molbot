@@ -6,7 +6,7 @@ import random
 utc = datetime.timezone.utc
 
 #midnight pst
-midnight = datetime.time(hour=8, minute=0, tzinfo=utc)
+midnight = datetime.time(hour=7, minute=0, tzinfo=utc)
 
 class GroupLeader(commands.Cog):
     def __init__(self, bot):
