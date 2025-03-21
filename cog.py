@@ -101,24 +101,22 @@ class GroupLeader(commands.Cog):
 
         if guild:
             members = [member for member in guild.members if not member.bot] #and role (to subscribe to game) in member.roles
-            role_name = 'pack member'
-            role = discord.utils.get(guild.roles, name=role_name) #get pack member role
-            members = [member for member in members if role in member.roles] #filter out non pack members
+
+            #clear previously assigned group leader role
+            gl = discord.utils.get(guild.roles, name='group leader')
+            for member in members:
+                if gl in member.roles:
+                    await member.remove_roles(gl)
+            
+            pm = discord.utils.get(guild.roles, name='pack member') #get pack member role
+            members = [member for member in members if pm in member.roles] #filter out non pack members
             if members:
                 self.group_leader = random.choice(members)
                 channel = guild.get_channel(1159064215735246921) #general
                 #NOTE: make a fork for local testing
                 if channel and self.group_leader:
                     try:
-                        role_name = 'group leader'
-                        role = discord.utils.get(guild.roles, name=role_name)
-
-                        #clear out previous group leader
-                        for member in members:
-                            if role in member.roles:
-                                await member.remove_roles(role)
-
-                        await self.group_leader.add_roles(role)
+                        await self.group_leader.add_roles(gl)
 
                     except discord.DiscordException as e:
                         channel.send(f'error assigning role: {e}')
