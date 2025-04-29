@@ -122,7 +122,10 @@ class GroupLeader(commands.Cog):
                         channel.send(f'error assigning role: {e}')
 
                     await channel.send(f'rise and grind alphas.... todays group leader is {self.group_leader.mention}!!')
-                    await channel.send(f'https://tenor.com/view/haechan-127hivemind-alpha-wolf-nct-nct-haechan-gif-26541424')
+                    if self.group_leader.id == '184011753221259265': #hard coding dayne's ID!
+                        await channel.send(f'https://cdn.discordapp.com/attachments/1159064215735246921/1366863504581070848/IMG_8222.jpg?ex=68127e56&is=68112cd6&hm=33e4c63667c72e0939d9e6f700e75fc4a1e35bacdfc3a7a474f0f4687662f17f&')
+                    else:
+                        await channel.send(f'https://tenor.com/view/haechan-127hivemind-alpha-wolf-nct-nct-haechan-gif-26541424')
 
     @sel_alpha.before_loop
     async def before_sel_alpha(self):
